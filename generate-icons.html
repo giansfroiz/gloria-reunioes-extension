@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Gerar Ícones - Gloria Reuniões</title>
+  <style>
+    body { font-family: sans-serif; background: #111; color: #eee; padding: 30px; }
+    h1 { color: #22c55e; }
+    canvas { border: 1px solid #333; margin: 5px; }
+    .btn { background: #22c55e; color: #000; border: none; padding: 10px 20px;
+           border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+    p { color: #888; margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <h1>Gerador de Ícones PNG</h1>
+  <p>Clique no botão para baixar os 3 tamanhos de ícone (16x16, 32x32, 128x128).<br>
+  Salve-os na pasta <code>icons/</code> da extensão.</p>
+  <div id="canvases"></div>
+  <button class="btn" onclick="downloadAll()">Baixar icon16.png + icon32.png + icon128.png</button>
+
+  <script>
+    const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="24" fill="#0d0d0d"/>
+  <circle cx="64" cy="52" r="22" fill="#22c55e"/>
+  <rect x="56" y="74" width="16" height="20" rx="4" fill="#22c55e"/>
+  <rect x="36" y="90" width="56" height="8" rx="4" fill="#22c55e"/>
+  <circle cx="64" cy="52" r="10" fill="#0d0d0d"/>
+  <rect x="60" y="44" width="8" height="16" rx="3" fill="#22c55e"/>
+</svg>`;
+
+    const sizes = [16, 32, 128];
+    const canvases = {};
+
+    const container = document.getElementById('canvases');
+
+    sizes.forEach(size => {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      canvas.title = size + 'x' + size;
+      container.appendChild(canvas);
+      canvases[size] = canvas;
+
+      const img = new Image();
+      const blob = new Blob([svgStr], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      img.onload = () => {
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, size, size);
+        URL.revokeObjectURL(url);
+      };
+      img.src = url;
+    });
+
+    function downloadAll() {
+      sizes.forEach(size => {
+        const canvas = canvases[size];
+        const link = document.createElement('a');
+        link.download = 'icon' + size + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
+    }
+  </script>
+</body>
+</html>
